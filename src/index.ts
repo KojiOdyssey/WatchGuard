@@ -6,7 +6,7 @@ import { isProd } from './config';
 import { handleEvents } from './utils/eventHandler';
 import { Client } from './types';
 
-dotenv.config({ path: '.env.' + process.env.NODE_ENV });
+dotenv.config({ path: isProd ? '.env' : '.env.development' });
 
 const client = new BaseClient({
     intents: [
