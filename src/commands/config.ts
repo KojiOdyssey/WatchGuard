@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChannelType } from 'discord-api-types/v10';
-import { Client, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { isDeepStrictEqual } from 'util';
 
 import { Emoji, Color } from '../config';
@@ -31,7 +31,7 @@ export const data = new SlashCommandBuilder()
                     .setDescription('Select a log channel.')
                     .addChannelTypes(ChannelType.GuildText)))
 
-export const execute = async (client: Client, interaction: any) => {
+export const execute = async (client: Client, interaction: CommandInteraction) => {
     const settings = await SettingsModel.findOne({ guildId: interaction.guildId });
 
     const logsEnabled = interaction.options.getString('logs_enabled');
@@ -67,27 +67,27 @@ export const execute = async (client: Client, interaction: any) => {
 
             const newSettings = {
                 logChannelId: logChannel?.id,
-                logsEnabled: JSON.parse(logsEnabled) ?? false
+                logsEnabled: JSON.parse(logsEnabled!) ?? false
             }
 
             const settingsExist = await SettingsModel.findOne(newSettings).lean();
             if (settingsExist
-                || hasSharedKeys(settings?.toObject(), newSettings, ['logChannelId', 'logsEnabled'])
-                || isDeepStrictEqual(settings?.toObject(), newSettings)
+                || hasSharedKeys(settings?.toObject() ?? {}, newSettings, ['logChannelId', 'logsEnabled'])
+                || isDeepStrictEqual(settings?.toObject() ?? {}, newSettings)
                 || (!logsEnabled && !logChannel))
                 return interaction.editReply({
                     embeds: [baseErrorEmbed
                         .setDescription('A settings document already exists for this server. Use `/settings show` to view the current settings or re-run the command with new values.')]
                 });
 
-            if (JSON.parse(logsEnabled) && !(logChannel || settings?.logChannelId))
+            if (JSON.parse(logsEnabled!) && !(logChannel || settings?.logChannelId))
                 return interaction.editReply({
                     embeds: [baseErrorEmbed
                         .setDescription('Please provide a log channel if you intend to enable logging.')]
                 });
 
             const filter = { guildId: interaction.guildId };
-            const update = { logChannelId: newSettings.logChannelId, logsEnabled: JSON.parse(logsEnabled) ?? undefined };
+            const update = { logChannelId: newSettings.logChannelId, logsEnabled: JSON.parse(logsEnabled!) ?? undefined };
             const settingsUpdate = await SettingsModel.findOneAndUpdate(filter, update, {
                 new: true, upsert: true
             });
