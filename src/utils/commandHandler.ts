@@ -1,6 +1,7 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import glob from 'glob';
+import { isProd } from '../config';
 
 import { Client } from '../types';
 
@@ -19,7 +20,9 @@ export const handleCommands = (client: Client, pattern: string) => {
     (async () => {
         try {
             await rest.put(
-                Routes.applicationGuildCommands(client.user!.id, process.env.MAIN_SERVER_ID!),
+                isProd
+                    ? Routes.applicationCommands(client.user!.id)
+                    : Routes.applicationGuildCommands(client.user!.id, process.env.MAIN_SERVER_ID!),
                 { body: commands },
             );
 
