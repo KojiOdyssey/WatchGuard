@@ -41,7 +41,7 @@ export const execute = async (client: Client, message: Message) => {
         .setTitle(Emoji.Cross + ' ')
         .setColor(Color.Error)
         .setDescription('We detected malicious content on a link you sent. ')
-        .setFooter({ text: 'Sent from ' + message.guild.name, iconURL: message.guild.iconURL()! })
+        .setFooter({ text: `Sent from ${message.guild.name}`, iconURL: message.guild.iconURL()! })
 
     if (!strikes?.striked) {
         const filter = { guildId: message.guildId, userId: message.author.id };

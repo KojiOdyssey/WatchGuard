@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ChannelType } from 'discord-api-types/v10';
-import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { Client, CommandInteraction, MessageActionRow, MessageButton, MessageEmbed, Permissions } from "discord.js";
 import { isDeepStrictEqual } from 'util';
 
 import { Emoji, Color } from '../config';
@@ -9,15 +9,15 @@ import { hasSharedKeys } from '../utils/utils';
 
 export const data = new SlashCommandBuilder()
     .setName('settings')
-    .setDescription('aasdfbw.')
+    .setDescription('Server-specific settings.')
     .addSubcommand(subcommand =>
         subcommand
             .setName('show')
-            .setDescription('View the current configuration.'))
+            .setDescription('View the current settings.'))
     .addSubcommand(subcommand =>
         subcommand
             .setName('set')
-            .setDescription('Set or modify configuration options.')
+            .setDescription('Set or modify the settings.')
             .addStringOption(option =>
                 option
                     .setName('logs_enabled')
@@ -62,8 +62,14 @@ export const execute = async (client: Client, interaction: CommandInteraction) =
             break;
         case 'set':
             const baseErrorEmbed = new MessageEmbed()
-                .setTitle(Emoji.Cross + ' Failed to update settings')
+                .setTitle(`${Emoji.Cross} Failed to update settings`)
                 .setColor(Color.Error);
+
+            if (!(interaction.member!.permissions as Readonly<Permissions>).has(Permissions.FLAGS.MANAGE_GUILD))
+                return interaction.editReply({
+                    embeds: [baseErrorEmbed
+                        .setDescription('You need the **Manage Server** permission to do this.')]
+                });
 
             const newSettings = {
                 logChannelId: logChannel?.id,
