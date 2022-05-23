@@ -39,16 +39,16 @@ export const execute = async (client: Client, interaction: any) => {
 
     const basePrimaryEmbed = new MessageEmbed()
         .setTitle('Settings')
-        .setColor(Color.Primary)
-        .setDescription('These are the current settings for this server. Change them by using:\n`/settings set <setting> <value>`');
+        .setColor(Color.Secondary)
 
     await interaction.deferReply();
 
     switch (interaction.options.getSubcommand()) {
         case 'show':
-            if (!settings) return interaction.editReply({ embeds: [basePrimaryEmbed.setDescription('No settings found.')] });
+            if (!settings) return interaction.editReply({ embeds: [basePrimaryEmbed.setFooter({ text: 'No settings found.' })] });
 
             const settingsEmbed = basePrimaryEmbed
+                .setDescription('These are the current settings for this server. Change them by using:\n`/settings set <setting> <value>`')
                 .addField('Log Channel:', settings!.logChannelId ? `<#${settings!.logChannelId}>` : 'Not set', true)
                 .addField('Logs Enabled:', settings!.logsEnabled ? 'Yes' : 'No', true);
 
@@ -93,6 +93,7 @@ export const execute = async (client: Client, interaction: any) => {
             });
 
             const settingsUpdateEmbed = basePrimaryEmbed
+                .setDescription('These are the updated settings for this server.')
                 .addField('Log Channel:', settingsUpdate!.logChannelId ? `<#${settingsUpdate!.logChannelId}>` : 'Not set', true)
                 .addField('Logs Enabled:', settingsUpdate!.logsEnabled ? 'Yes' : 'No', true);
 
