@@ -32,6 +32,6 @@
     "get-urls": "^10.0.0",
     "glob": "^7.2.0",
     "lru-cache": "^7.10.1",
-    "mongoose": "^6.3.3"
+    "mongoose": "^6.4.6"
   }
 }
